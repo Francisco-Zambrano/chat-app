@@ -10,16 +10,27 @@ function App() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setMessages([...messages, message]);
+
+    const newMessage = {
+      body: message,
+      from: 'Me'
+    }
+
+    setMessages([...messages, newMessage]);
     socket.emit('message', message);
   };
 
   useEffect(() => {
-    socket.on('message', message => {
-      console.log(message)
-      setMessages([...messages, message])
-    })
-  }, [])
+    socket.on('message', receivedMessage);
+
+    return () => {
+      socket.off('message', receivedMessage);
+    };
+  }, []);
+
+  const receivedMessage = (message) => {
+    setMessages((state) => [...state, message]);
+  }
 
 
   return (
@@ -37,7 +48,7 @@ function App() {
       <ul>
         {
           messages.map((message, id) => (
-            <li key={id}>{message}</li>
+            <li key={id}>{message.from}: {message.body}</li>
           ))
         }
       </ul>
