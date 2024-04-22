@@ -8,6 +8,10 @@ const io = new SocketServer(server)
 
 io.on('connection', socket => {
     console.log('client connected')
+
+    socket.on('message', (data) => {
+        socket.broadcast.emit('message', data)
+    })
 })
 
 server.listen(3000)
